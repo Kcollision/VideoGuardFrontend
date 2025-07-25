@@ -1,0 +1,25 @@
+.result-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-title {
+    background-color: #0175C2;
+    color: white;
+    margin: 0;
+    padding: 15px;
+    font-size: 18px;
+  }
+  
+  .card-content {
+    padding: 15px;
+  }

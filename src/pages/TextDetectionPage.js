@@ -14,6 +14,33 @@ const TextDetectionPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [results, setResults] = useState(null);
   const fileInputRef = useRef(null);
+  
+  // 新增进度条相关状态
+  const [detectionProgress, setDetectionProgress] = useState(0);
+  const [progressInterval, setProgressInterval] = useState(null);
+
+  // 开始假进度条
+  const startFakeProgress = () => {
+    setDetectionProgress(0);
+    const interval = setInterval(() => {
+      setDetectionProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 1000); // 每秒增加10%
+    setProgressInterval(interval);
+  };
+
+  // 清理进度条
+  const clearProgress = () => {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      setProgressInterval(null);
+    }
+  };
 
   // 切换输入方式
   const handleInputTypeChange = (e) => {
@@ -22,6 +49,8 @@ const TextDetectionPage = () => {
     setInputText('');
     setSelectedFile(null);
     setResults(null);
+    setDetectionProgress(0);
+    clearProgress();
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -63,21 +92,32 @@ const TextDetectionPage = () => {
     }
     setIsProcessing(true);
     setResults(null);
+    
+    // 开始假进度条
+    startFakeProgress();
+    
     try {
       const response = await axios.post(SERVER_TEXT, { text });
+      
+      // 完成进度条到100%
+      setDetectionProgress(100);
+      
       setResults(response.data);
     } catch (err) {
       message.error('处理文本时出错，请重试');
     } finally {
+      clearProgress();
       setIsProcessing(false);
     }
   };
 
   // 重新上传
   const handleReupload = () => {
+    clearProgress();
     setSelectedFile(null);
     setInputText('');
     setResults(null);
+    setDetectionProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -167,16 +207,41 @@ const TextDetectionPage = () => {
       {/* 处理中指示 */}
       {isProcessing && (
         <div className="processing-indicator">
-          <p>正在分析文本，请稍候...</p>
-          <div className="spinner"></div>
+          <div style={{ width: 400, margin: '0 auto' }}>
+            <div style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#f0f0f0',
+              borderRadius: '4px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <div style={{
+                width: `${detectionProgress}%`,
+                height: '100%',
+                backgroundColor: '#1890ff',
+                borderRadius: '4px',
+                transition: 'width 0.3s ease-in-out',
+                position: 'absolute',
+                left: 0,
+                top: 0
+              }}></div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 8 }}>
+            <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
+              {Math.round(detectionProgress)}%
+            </span>
+          </div>
+          <p style={{ marginTop: 8, fontSize: 12, color: '#666', textAlign: 'center' }}>
+            {detectionProgress >= 90 ? '正在等待服务器返回结果...' : '正在处理文本，请稍候...'}
+          </p>
         </div>
       )}
 
       {/* 检测结果 */}
       {results && (
-        <div
-          className="results-section"
-        >
+        <div className="results-section">
           <h2>检测结果</h2>
             <div className="summary-box"
             style={{
@@ -194,7 +259,7 @@ const TextDetectionPage = () => {
               {results['violation_categories']?.join('，')}
             </p>
           </div>
-          {/* 仅当不是“正常”时显示违规片段 */}
+          {/* 仅当不是"正常"时显示违规片段 */}
           {!(results['violation_categories']?.length === 1 && results['violation_categories'][0] === '正常') && (
             <div className="summary-box"
             style={{

@@ -8,18 +8,6 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [activeFeature, setActiveFeature] = useState(0);
 
-  // 自动切换特性展示
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 4000); // 减少切换时间
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
   // 优化特性数据，添加图标
   const features = [
     {
@@ -44,6 +32,18 @@ const HomePage = () => {
     }
   ];
 
+  // 自动切换特性展示
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 4000); // 减少切换时间
+    return () => clearInterval(interval);
+  }, [features.length]);
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   // 检测类型数据
   const detectionTypes = [
     {
@@ -51,7 +51,8 @@ const HomePage = () => {
       title: '视频检测',
       description: '智能分析视频内容，识别有害场景和行为',
       icon: <VideoCameraOutlined />,
-      features: ['场景识别', '动作分析', '物体检测', '人脸识别'],
+      // features: ['场景识别', '动作分析', '物体检测', '人脸识别'],
+      features: [ '图像识别','动作分析',  '时序分析'],
       color: '#ff4d4f',
       gradient: 'linear-gradient(135deg, #1890ff, #40a9ff)'
     },
@@ -60,16 +61,16 @@ const HomePage = () => {
       title: '音频检测',
       description: '深度分析音频内容，识别语音和环境音',
       icon: <AudioOutlined />,
-      features: ['语音识别', '情感分析', '语种识别', '噪音过滤'],
+      features: ['语音识别', '语种识别', '噪音过滤'],
       color: '#52c41a',
       gradient: 'linear-gradient(135deg, #1890ff, #40a9ff)'
     },
     {
       key: '/text-detection',
       title: '文本检测',
-      description: '智能分析文本内容，识别敏感词汇和情感',
+      description: '智能分析文本内容，识别敏感词汇和主题',
       icon: <FileTextOutlined />,
-      features: ['敏感词检测', '情感分析', '语义理解', '主题分类'],
+      features: ['敏感词检测', '语义理解', '主题分类'],
       color: '#1890ff',
       gradient: 'linear-gradient(135deg, #1890ff, #40a9ff)'
     }
@@ -89,9 +90,7 @@ const HomePage = () => {
           <h2>VideoGuard</h2>
         </div>
         <nav className="nav-links">
-          <a href="#features">特性</a>
-          <a href="#stats">数据</a>
-          <a href="#about">关于</a>
+          <a href="#common-issues" onClick={(e) => { e.preventDefault(); handleNavigation('/faq'); }}>常见问题</a>
         </nav>
       </header>
 
@@ -101,7 +100,7 @@ const HomePage = () => {
           <div className="hero-badge">
             <Badge.Ribbon text="AI驱动" color="gold">
               <div className="hero-title-wrapper">
-                <h1>基于大模型与多模态融合的<br/>短视频平台有害内容检测系统</h1>
+                <h1>基于大模型的短视频有害内容检测与预警系统</h1>
               </div>
             </Badge.Ribbon>
           </div>
@@ -110,7 +109,7 @@ const HomePage = () => {
           </p>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="stat-number">92.9%</span>
+              <span className="stat-number">90.9%</span>
               <span className="stat-label">准确率</span>
             </div>
             <div className="hero-stat">
@@ -219,7 +218,7 @@ const HomePage = () => {
             <Col >
               <Statistic
                 title="检测准确率"
-                value={99.2}
+                value={90.2}
                 precision={1}
                 suffix="%"
                 valueStyle={{ color: '#fff', fontSize: '2.5rem', fontWeight: 'bold' }}
@@ -229,9 +228,9 @@ const HomePage = () => {
          
             <Col>
               <Statistic
-                title="处理数据量"
+                title="处理视频数"
                 value={1000}
-                suffix="MB+"
+                suffix="+"
                 valueStyle={{ color: '#fff', fontSize: '2.5rem', fontWeight: 'bold' }}
                 prefix="📊"
               />
@@ -274,7 +273,7 @@ const HomePage = () => {
       {/* 页脚优化 */}
       <footer className="home-footer">
         <div className="footer-content">
-          <p>© 2025 面向短视频平台的有害内容检测与阻断系统 | 版权所有</p>
+          <p>© 2025 VideoGuard:基于大模型的短视频有害内容检测与预警系统 | 版权所有</p>
           <div className="footer-links">
             <a href="#privacy">隐私政策</a>
             <a href="#terms">服务条款</a>

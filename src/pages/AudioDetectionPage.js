@@ -15,35 +15,65 @@ const AudioDetectionPage = () => {
   const [results, setResults] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
-    
-    const success = (str1) => {
-      messageApi.open({
-        type: 'success',
-        content: str1,
-        duration: 2,
-      });
-    };
-
-    const error = (str1) => {
-      messageApi.open({
-        type: 'error',
-        content: str1,
-        duration: 2,
-      });
-    };
   
-    const warning = (str1) => {
-      messageApi.open({
-        type: 'warning',
-        content: str1,
-        duration: 2,
+  // 新增进度条相关状态
+  const [detectionProgress, setDetectionProgress] = useState(0);
+  const [progressInterval, setProgressInterval] = useState(null);
+    
+  const success = (str1) => {
+    messageApi.open({
+      type: 'success',
+      content: str1,
+      duration: 2,
+    });
+  };
+
+  const error = (str1) => {
+    messageApi.open({
+      type: 'error',
+      content: str1,
+      duration: 2,
+    });
+  };
+
+  const warning = (str1) => {
+    messageApi.open({
+      type: 'warning',
+      content: str1,
+      duration: 2,
+    });
+  };
+
+  // 开始假进度条
+  const startFakeProgress = () => {
+    setDetectionProgress(0);
+    const interval = setInterval(() => {
+      setDetectionProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return 90;
+        }
+        return prev + 10;
       });
-    };
+    }, 1000); // 每秒增加10%
+    setProgressInterval(interval);
+  };
+
+  // 清理进度条
+  const clearProgress = () => {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      setProgressInterval(null);
+    }
+  };
+
   // 重新上传
   const handleReupload = () => {
+    clearProgress();
     setSelectedFile(null);
     setResults(null);
     setAudioPreview(null);
+    setDetectionProgress(0);
   };
 
   // 上传并检测
@@ -54,12 +84,20 @@ const AudioDetectionPage = () => {
     }
     setIsProcessing(true);
     setResults(null);
+    
+    // 开始假进度条
+    startFakeProgress();
+    
     try {
       const formData = new FormData();
       formData.append('audio', selectedFile);
       const response = await axios.post(SERVER_AUDIO, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      
+      // 完成进度条到100%
+      setDetectionProgress(100);
+      
       // 处理后端返回的字符串JSON
       const data = response.data;
       if (typeof data.audio_details === 'string') {
@@ -75,6 +113,7 @@ const AudioDetectionPage = () => {
     } catch (error) {
       error('处理音频时出错，请重试');
     } finally {
+      clearProgress();
       setIsProcessing(false);
     }
   };
@@ -134,8 +173,35 @@ const AudioDetectionPage = () => {
 
           {isProcessing && (
             <div className="processing-indicator">
-              <p>正在处理音频，请稍候...</p>
-              <div className="spinner"></div>
+              <div style={{ width: 400, margin: '0 auto' }}>
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    width: `${detectionProgress}%`,
+                    height: '100%',
+                    backgroundColor: '#1890ff',
+                    borderRadius: '4px',
+                    transition: 'width 0.3s ease-in-out',
+                    position: 'absolute',
+                    left: 0,
+                    top: 0
+                  }}></div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
+                <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
+                  {Math.round(detectionProgress)}%
+                </span>
+              </div>
+              <p style={{ marginTop: 8, fontSize: 12, color: '#666', textAlign: 'center' }}>
+                {detectionProgress >= 90 ? '正在等待服务器返回结果...' : '正在处理音频，请稍候...'}
+              </p>
             </div>
           )}
 
@@ -172,19 +238,11 @@ const AudioDetectionPage = () => {
                 }}
                 >
                   <h3>违规片段</h3>
-                  {/* <ul>
-                    {results.audio_violation_texts?.map((txt, idx) => (
-                      <li key={idx}>{txt}</li>
-                    ))}
-                  </ul> */}
                   <p>
                     {results.audio_violation_texts?.join('，')}
                   </p>
                 </div>
               )}
-
-
-              
             </div>
           )}
         </div>

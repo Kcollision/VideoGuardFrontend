@@ -7,8 +7,9 @@ import HomePage from './pages/HomePage';
 import VideoDetectionPage from './pages/VideoDetectionPage';
 import AudioDetectionPage from './pages/AudioDetectionPage';
 import TextDetectionPage from './pages/TextDetectionPage';
+import FAQPage from './pages/FAQPage';
 
-const { Header, Content } = Layout;
+const { Header } = Layout;
 
 function App() {
   const navigate = useNavigate();
@@ -102,6 +103,7 @@ function App() {
           <Route path="/video-detection" element={<VideoDetectionPage />} />
           <Route path="/audio-detection" element={<AudioDetectionPage />} />
           <Route path="/text-detection" element={<TextDetectionPage />} />
+          <Route path="/faq" element={<FAQPage />} />
         </Routes>
         
       </Layout>

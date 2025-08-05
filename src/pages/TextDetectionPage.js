@@ -123,7 +123,7 @@ const TextDetectionPage = () => {
 
   return (
     <center>
-    <div className="detection-container">
+    <div className="detection-container" style={{backgroundColor: '#f5f5dc',minHeight: '100vh'}}>
       <h1>文本内容检测</h1>
       {/* 输入方式切换Radio */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>

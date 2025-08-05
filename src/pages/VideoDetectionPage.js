@@ -400,7 +400,9 @@ const VideoDetectionPage = () => {
           description:
             text_violation[0] !== "正常" ? text_violation[0] : "正常",
         },
-      ],
+      ],    
+    // 保存举报结果信息
+    reportResult: result.report_result || null,
     });
     success("视频检测完成!");
   };
@@ -427,10 +429,11 @@ const VideoDetectionPage = () => {
   return (
     <>
       {contextHolder}
+      <div style={{ backgroundColor: '#f5f5dc', minHeight: '100vh' }}>
       <center>
         <div className="detection-container">
           <h1>视频内容检测</h1>
-          <div className="upload-section">
+          <div className="upload-section" style={{ backgroundColor: '#f5f5dc'}}>
             <div className="video-upload-panel">
               <Radio.Group
                 value={uploadMethod}
@@ -599,7 +602,63 @@ const VideoDetectionPage = () => {
           {results && (
             <div className="results-section">
               <h2>检测结果</h2>
-
+            {/* 举报提示信息 */}
+            {results.reportResult && (
+              <div
+                style={{
+                  marginBottom: 24,
+                  padding: 16,
+                  background: "#fff2f0",
+                  border: "1px solid #ffbb96",
+                  borderRadius: 8,
+                  borderLeft: "4px solid #ff4d4f",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+                  <span style={{ fontSize: 16, fontWeight: "bold", color: "#ff4d4f" }}>
+                    ⚠️ 违规内容举报
+                  </span>
+                </div>
+                <div style={{ marginBottom: 8 }}>
+                  <span style={{ fontWeight: "bold" }}>举报状态：</span>
+                  <span style={{ color: results.reportResult.success ? "#52c41a" : "#ff4d4f" }}>
+                    {results.reportResult.message}
+                  </span>
+                </div>
+                {results.reportResult.bv && (
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{ fontWeight: "bold" }}>视频BV号：</span>
+                    <span style={{ fontFamily: "monospace", backgroundColor: "#f5f5f5", padding: "2px 6px", borderRadius: 4 }}>
+                      {results.reportResult.bv}
+                    </span>
+                  </div>
+                )}
+                {results.reportResult.aid && (
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{ fontWeight: "bold" }}>视频AV号：</span>
+                    <span style={{ fontFamily: "monospace", backgroundColor: "#f5f5f5", padding: "2px 6px", borderRadius: 4 }}>
+                      {results.reportResult.aid}
+                    </span>
+                  </div>
+                )}
+                {results.reportResult.bv && (
+                  <div>
+                    <span style={{ fontWeight: "bold" }}>视频链接：</span>
+                    <a 
+                      href={`https://www.bilibili.com/video/${results.reportResult.bv}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#1890ff", textDecoration: "none" }}
+                    >
+                      https://www.bilibili.com/video/{results.reportResult.bv}
+                    </a>
+                  </div>
+                )}
+                <div style={{ marginTop: 12, fontSize: 12, color: "#8c8c8c" }}>
+                  💡 检测到该视频为色情内容，系统已自动进行举报处理
+                </div>
+              </div>
+            )}
               <div
                 className="summary-box"
                 style={{
@@ -807,6 +866,7 @@ const VideoDetectionPage = () => {
           )}
         </div>
       </center>
+      </div>
     </>
   );
 };

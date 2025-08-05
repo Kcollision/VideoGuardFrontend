@@ -121,11 +121,12 @@ const AudioDetectionPage = () => {
   return (
     <>
       {contextHolder}
+      <div style={{ backgroundColor: '#f5f5dc', minHeight: '100vh' }}>
       <center>
         <div className="detection-container">
           <h1>音频内容检测</h1>
 
-          <div className="upload-section" style={{ width: 400, margin: '0 auto' }}>
+          <div className="upload-section" style={{ backgroundColor: '#f5f5dc',width: 400, margin: '0 auto' }}>
             {!selectedFile ? (
               <Dragger
                 name="audio"
@@ -247,6 +248,7 @@ const AudioDetectionPage = () => {
           )}
         </div>
       </center>
+      </div>
     </>
   );
 };

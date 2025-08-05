@@ -10,7 +10,7 @@ const Header = ({ title }) => {
   };
 
   return (
-    <header className="app-header">
+    <header className="app-header" style={{ backgroundColor: '#f5f5dc' }}>
       <div className="header-content">
         <div className="logo" onClick={handleHomeClick}>
           <span className="logo-text">多媒体检测</span>
